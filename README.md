@@ -1,4 +1,4 @@
-#Абай Quiz
+# Абай Quiz
 This Flutter app delivers structured reading content with quizzes about "Абай Жолы".
 
 ## Абай Құнанбайұлы жайлы ақпарат

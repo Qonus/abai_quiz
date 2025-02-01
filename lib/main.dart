@@ -13,21 +13,15 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
+final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
+const List<Widget> widgetOptions = <Widget>[
+  AnalysisPage(),
+  QuizPage(),
+  AnalysisPage(),
+];
+int selectedIndex = 0;
+
 class _MainAppState extends State<MainApp> {
-  final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
-  int selectedIndex = 0;
-  static const List<Widget> widgetOptions = <Widget>[
-    AnalysisPage(),
-    QuizPage(),
-    AnalysisPage(),
-  ];
-
-  void onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
@@ -37,69 +31,89 @@ class _MainAppState extends State<MainApp> {
             title: 'Abai Quiz',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
+              useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.orange,
                 brightness: Brightness.light,
               ),
-              useMaterial3: true,
             ),
             darkTheme: ThemeData(
+              useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Colors.orange,
                 brightness: Brightness.dark,
               ),
-              useMaterial3: true,
             ),
             themeMode: mode,
-            home: Scaffold(
-              appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                title: Text('Abai Quiz'),
-              ),
-              body: widgetOptions.elementAt(selectedIndex),
-              bottomNavigationBar: BottomNavigationBar(
-                items: [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: "Home",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.question_mark),
-                    label: "Quiz",
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: "Profile",
-                  ),
-                ],
-                currentIndex: selectedIndex,
-                selectedItemColor: Theme.of(context).colorScheme.inversePrimary,
-                onTap: onItemTapped,
-              ),
-              endDrawer: Drawer(
-                child: Center(
-                  child: SegmentedButton<ThemeMode>(
-                    segments: [
-                      ButtonSegment(
-                          value: ThemeMode.light,
-                          label: Text('Light'),
-                          icon: Icon(Icons.light_mode)),
-                      ButtonSegment(
-                          value: ThemeMode.dark,
-                          label: Text('Dark'),
-                          icon: Icon(Icons.dark_mode)),
-                    ],
-                    selected: <ThemeMode>{mode},
-                    onSelectionChanged: (Set<ThemeMode> newSelection) {
-                      setState(() {
-                        _notifier.value = newSelection.first;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ),
+            home: App(),
           );
         });
+  }
+}
+
+class App extends StatefulWidget {
+  const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  void onItemTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('Abai Quiz'),
+      ),
+      body: widgetOptions.elementAt(selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.question_mark),
+            label: "Quiz",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
+          ),
+        ],
+        currentIndex: selectedIndex,
+        selectedItemColor: Theme.of(context).colorScheme.inversePrimary,
+        onTap: onItemTapped,
+      ),
+      endDrawer: Drawer(
+        child: Center(
+          child: SegmentedButton<ThemeMode>(
+            segments: [
+              ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text('Light'),
+                  icon: Icon(Icons.light_mode)),
+              ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text('Dark'),
+                  icon: Icon(Icons.dark_mode)),
+            ],
+            selected: <ThemeMode>{_notifier.value},
+            onSelectionChanged: (Set<ThemeMode> newSelection) {
+              setState(() {
+                _notifier.value = newSelection.first;
+              });
+            },
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -83,7 +83,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                 return Card(
                   margin: EdgeInsets.all(10),
                   child: ListTile(
-                    contentPadding: EdgeInsets.fromLTRB(20, 5, 0, 5),
+                    contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                     title: Text(page.title),
                     onTap: () {
                       Navigator.push(
