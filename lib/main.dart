@@ -1,5 +1,5 @@
 import 'package:abai_quiz/pages/analysis.dart';
-import 'package:abai_quiz/pages/quiz.dart';
+import 'package:abai_quiz/pages/chat.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,12 +14,6 @@ class MainApp extends StatefulWidget {
 }
 
 final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
-const List<Widget> widgetOptions = <Widget>[
-  AnalysisPage(),
-  QuizPage(),
-  AnalysisPage(),
-];
-int selectedIndex = 0;
 
 class _MainAppState extends State<MainApp> {
   @override
@@ -58,6 +52,13 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
+const List<Widget> widgetOptions = <Widget>[
+  ChatPage(),
+  AnalysisPage(),
+  AnalysisPage(),
+];
+int selectedIndex = 0;
+
 class _AppState extends State<App> {
   void onItemTapped(int index) {
     setState(() {
@@ -76,12 +77,12 @@ class _AppState extends State<App> {
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
+            icon: Icon(Icons.chat),
+            label: "Chat",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.question_mark),
-            label: "Quiz",
+            icon: Icon(Icons.search),
+            label: "Analysis",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
