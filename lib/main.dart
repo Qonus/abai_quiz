@@ -1,8 +1,11 @@
 import 'package:abai_quiz/pages/analysis.dart';
 import 'package:abai_quiz/pages/chat.dart';
+import 'package:abai_quiz/widgets/menu_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load();
   runApp(MainApp());
 }
 
@@ -13,13 +16,20 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
+class Notifier {
+
+  static final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
+
+  static ValueNotifier<ThemeMode> get(){
+    return _notifier;
+  }
+}
 
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
-        valueListenable: _notifier,
+        valueListenable: Notifier.get(),
         builder: (_, mode, __) {
           return MaterialApp(
             title: 'Abai Quiz',
@@ -27,14 +37,14 @@ class _MainAppState extends State<MainApp> {
             theme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.orange,
+                seedColor: Colors.orangeAccent,
                 brightness: Brightness.light,
               ),
             ),
             darkTheme: ThemeData(
               useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.orange,
+                seedColor: Colors.orangeAccent,
                 brightness: Brightness.dark,
               ),
             ),
@@ -77,15 +87,15 @@ class _AppState extends State<App> {
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
+            icon: Icon(Icons.chat_outlined),
             label: "Chat",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: "Analysis",
+            icon: Icon(Icons.info_outlined),
+            label: "Ақпарат",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person_outline),
             label: "Profile",
           ),
         ],
@@ -93,28 +103,7 @@ class _AppState extends State<App> {
         selectedItemColor: Theme.of(context).colorScheme.inversePrimary,
         onTap: onItemTapped,
       ),
-      endDrawer: Drawer(
-        child: Center(
-          child: SegmentedButton<ThemeMode>(
-            segments: [
-              ButtonSegment(
-                  value: ThemeMode.light,
-                  label: Text('Light'),
-                  icon: Icon(Icons.light_mode)),
-              ButtonSegment(
-                  value: ThemeMode.dark,
-                  label: Text('Dark'),
-                  icon: Icon(Icons.dark_mode)),
-            ],
-            selected: <ThemeMode>{_notifier.value},
-            onSelectionChanged: (Set<ThemeMode> newSelection) {
-              setState(() {
-                _notifier.value = newSelection.first;
-              });
-            },
-          ),
-        ),
-      ),
+      endDrawer: MenuDrawer(),
     );
   }
 }

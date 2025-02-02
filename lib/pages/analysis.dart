@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:abai_quiz/widgets/menu_drawer.dart';
+import 'package:abai_quiz/widgets/quiz_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -62,11 +64,20 @@ class PagesCache {
 }
 
 class _AnalysisPageState extends State<AnalysisPage> {
+  void _onTap(PageData page) {
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (context) => PageWidget(page: page),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: FutureBuilder<List<PageData>>(
-        future: PagesCache.loadPages(),
+        future: PagesCache.loadPages(),        
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -80,19 +91,11 @@ class _AnalysisPageState extends State<AnalysisPage> {
               itemCount: pages.length,
               itemBuilder: (context, index) {
                 PageData page = pages[index];
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                    title: Text(page.title),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => PageWidget(page: page),
-                        ),
-                      );
-                    },
+                return Container(
+                  margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                  child: QuizCard(
+                    title: page.title,
+                    onTap: () => _onTap(page),
                   ),
                 );
               },
@@ -116,13 +119,31 @@ class PageWidget extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(page.title),
       ),
+      endDrawer: MenuDrawer(),
       body: Center(
         child: Markdown(
           selectable: true,
           data: page.markdown,
           styleSheet: MarkdownStyleSheet(
-            h1: TextStyle(fontSize: 24, color: Theme.of(context).colorScheme.inversePrimary),
-            code: TextStyle(fontSize: 14, color: Colors.green), // new end
+            h1: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.inversePrimary,
+            ),
+            h2: TextStyle(
+              fontSize: 23,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.inversePrimary,
+            ),
+            h3: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.inversePrimary,
+            ),
+            p: TextStyle(
+              fontSize: 17,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ),
       ),
