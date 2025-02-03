@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:abai_quiz/widgets/message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -25,6 +26,7 @@ class Messages {
   static void add(Map<String, String> message) {
     messages.add(message);
   }
+
   static void clear() {
     messages = [
       systemMessage,
@@ -39,9 +41,7 @@ class Messages {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
 
-  void updateMessages() {
-    
-  }
+  void updateMessages() {}
 
   Future<void> sendMessage() async {
     String userMessage = _controller.text.trim();
@@ -108,22 +108,7 @@ class _ChatPageState extends State<ChatPage> {
               if (message["role"] == "system") return Container();
               final isUser = message["role"] == "user";
 
-              return Container(
-                alignment:
-                    isUser ? Alignment.centerRight : Alignment.centerLeft,
-                padding: EdgeInsets.all(8),
-                margin: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: isUser
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: MarkdownBody(
-                  selectable: true,
-                  data: message["content"] ?? "",
-                ),
-              );
+              return MessageWidget(isMyMessage: isUser, markdownText: message["content"]);
             },
           ),
         ),
