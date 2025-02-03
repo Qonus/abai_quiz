@@ -7,11 +7,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
+class QuizData {
+  final String question;
+  final List<String> answers;
+  final int correct;
+
+  QuizData({
+    required this.question,
+    required this.answers,
+    required this.correct,
+  });
+
+  factory QuizData.fromJson(Map<String, dynamic> json) {
+    return QuizData(
+      question: json['question'] as String,
+      answers: List<String>.from(json['answers'] as List),
+      correct: json['correct'] as int,
+    );
+  }
+}
+
 class PageData {
   final String title;
   final String markdown;
 
   PageData({required this.title, required this.markdown});
+
+  // QuizData generateQuiz() {
+  //   return QuizData.fromJson(json);
+  // }
 
   // factory PageData.fromJson(Map<String, dynamic> json) {
   //   return PageData(
@@ -21,14 +45,14 @@ class PageData {
   // }
 }
 
-class QuizPage extends StatefulWidget {
-  const QuizPage({super.key});
+class QuizMainPage extends StatefulWidget {
+  const QuizMainPage({super.key});
 
   @override
-  State<QuizPage> createState() => _QuizPageState();
+  State<QuizMainPage> createState() => _QuizMainPageState();
 }
 
-class PagesCache {
+class QuizesCache {
   static List<PageData>? _cachedPages;
 
   static Future<List<PageData>> getPages() async {
@@ -63,7 +87,7 @@ class PagesCache {
   }
 }
 
-class _QuizPageState extends State<QuizPage> {
+class _QuizMainPageState extends State<QuizMainPage> {
   void _onTap(PageData page) {
     Navigator.push(
       context,
@@ -77,7 +101,7 @@ class _QuizPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     return Center(
       child: FutureBuilder<List<PageData>>(
-        future: PagesCache.loadPages(),        
+        future: QuizesCache.loadPages(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -120,32 +144,50 @@ class PageWidget extends StatelessWidget {
         title: Text(page.title),
       ),
       endDrawer: MenuDrawer(),
-      body: Center(
-        child: Markdown(
-          selectable: true,
-          data: page.markdown,
-          styleSheet: MarkdownStyleSheet(
-            h1: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.inversePrimary,
-            ),
-            h2: TextStyle(
-              fontSize: 23,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.inversePrimary,
-            ),
-            h3: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.inversePrimary,
-            ),
-            p: TextStyle(
-              fontSize: 17,
-              color: Theme.of(context).colorScheme.onSurface,
+      body: ListView(
+        padding: EdgeInsets.all(10),
+        children: [
+          Container(
+            child: MarkdownBody(
+              selectable: true,
+              data: page.markdown,
+              styleSheet: MarkdownStyleSheet(
+                h1: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                h2: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                h3: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+                p: TextStyle(
+                  fontSize: 17,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
             ),
           ),
-        ),
+          OutlinedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => PageWidget(page: page),
+                  ),
+                );
+              },
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              child: Text("Біліміңді тексер!")),
+        ],
       ),
     );
   }

@@ -66,7 +66,7 @@ class App extends StatefulWidget {
 const List<Widget> widgetOptions = <Widget>[
   HomePage(),
   ChatPage(),
-  QuizPage(),
+  QuizMainPage(),
 ];
 int selectedIndex = 0;
 

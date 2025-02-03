@@ -25,7 +25,9 @@ class _MenuDrawerState extends State<MenuDrawer> {
             spacing: 20,
             children: [
               OutlinedButton(
-                style: ButtonStyle(padding:WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 15, horizontal: 20))),
+                style: ButtonStyle(
+                    padding: WidgetStatePropertyAll(
+                        EdgeInsets.symmetric(vertical: 15, horizontal: 20))),
                 onPressed: () {
                   Messages.clear();
                 },

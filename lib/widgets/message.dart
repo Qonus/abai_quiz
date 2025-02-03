@@ -25,18 +25,21 @@ class MessageWidget extends StatelessWidget {
           isMyMessage ? SizedBox(width: 50) : Icon(Icons.person_2_outlined),
           Flexible(
             child: Container(
-              padding: const EdgeInsets.all(10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
               decoration: BoxDecoration(
                 color: isMyMessage
                     ? Theme.of(context).colorScheme.primaryContainer
                     : Theme.of(context).colorScheme.surfaceContainerLow,
                 borderRadius: BorderRadius.only(
-                    topLeft: isMyMessage ? Radius.circular(10) : Radius.circular(0),
-                    topRight: isMyMessage ? Radius.circular(0) : Radius.circular(10),
+                    topLeft:
+                        isMyMessage ? Radius.circular(10) : Radius.circular(0),
+                    topRight:
+                        isMyMessage ? Radius.circular(0) : Radius.circular(10),
                     bottomLeft: Radius.circular(10),
                     bottomRight: Radius.circular(10)),
               ),
-              child: MarkdownBody(data: markdownText ?? ""),
+              child: markdownText == "" ? CircularProgressIndicator() : MarkdownBody(selectable: true, data: markdownText ?? ""),
             ),
           ),
           isMyMessage ? Icon(Icons.person) : SizedBox(width: 20),
