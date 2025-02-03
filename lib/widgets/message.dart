@@ -22,7 +22,7 @@ class MessageWidget extends StatelessWidget {
             isMyMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          isMyMessage ? SizedBox(width: 50) : Icon(Icons.person),
+          isMyMessage ? SizedBox(width: 50) : Icon(Icons.person_2_outlined),
           Flexible(
             child: Container(
               padding: const EdgeInsets.all(10.0),
