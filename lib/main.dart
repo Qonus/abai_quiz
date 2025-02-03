@@ -1,8 +1,12 @@
-import 'package:abai_quiz/pages/analysis.dart';
+import 'package:abai_quiz/pages/quiz.dart';
 import 'package:abai_quiz/pages/chat.dart';
+import 'package:abai_quiz/pages/home.dart';
+import 'package:abai_quiz/widgets/menu_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load();
   runApp(MainApp());
 }
 
@@ -13,13 +17,20 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
+class Notifier {
+
+  static final ValueNotifier<ThemeMode> _notifier = ValueNotifier(ThemeMode.dark);
+
+  static ValueNotifier<ThemeMode> get(){
+    return _notifier;
+  }
+}
 
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
-        valueListenable: _notifier,
+        valueListenable: Notifier.get(),
         builder: (_, mode, __) {
           return MaterialApp(
             title: 'Abai Quiz',
@@ -53,9 +64,9 @@ class App extends StatefulWidget {
 }
 
 const List<Widget> widgetOptions = <Widget>[
+  HomePage(),
   ChatPage(),
-  AnalysisPage(),
-  AnalysisPage(),
+  QuizPage(),
 ];
 int selectedIndex = 0;
 
@@ -77,44 +88,23 @@ class _AppState extends State<App> {
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: "Chat",
+            icon: Icon(Icons.house_outlined),
+            label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: "Analysis",
+            icon: Icon(Icons.chat_outlined),
+            label: "Чат",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
+            icon: Icon(Icons.info_outlined),
+            label: "Ақпарат",
           ),
         ],
         currentIndex: selectedIndex,
         selectedItemColor: Theme.of(context).colorScheme.inversePrimary,
         onTap: onItemTapped,
       ),
-      endDrawer: Drawer(
-        child: Center(
-          child: SegmentedButton<ThemeMode>(
-            segments: [
-              ButtonSegment(
-                  value: ThemeMode.light,
-                  label: Text('Light'),
-                  icon: Icon(Icons.light_mode)),
-              ButtonSegment(
-                  value: ThemeMode.dark,
-                  label: Text('Dark'),
-                  icon: Icon(Icons.dark_mode)),
-            ],
-            selected: <ThemeMode>{_notifier.value},
-            onSelectionChanged: (Set<ThemeMode> newSelection) {
-              setState(() {
-                _notifier.value = newSelection.first;
-              });
-            },
-          ),
-        ),
-      ),
+      endDrawer: MenuDrawer(),
     );
   }
 }
