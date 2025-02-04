@@ -6,11 +6,11 @@ class QuizCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const QuizCard({
-    Key? key,
+    super.key,
     required this.title,
     this.progress,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class QuizCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
-                  value: progress != null ? progress : 0,
+                  value: progress ?? 0,
                   minHeight: 5,
                   backgroundColor: progress != null ? Theme.of(context).colorScheme.errorContainer : Theme.of(context).colorScheme.surfaceDim,
                   valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),

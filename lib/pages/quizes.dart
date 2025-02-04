@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:abai_quiz/groq_api_client.dart';
+import 'package:abai_quiz/pages/question.dart';
 import 'package:abai_quiz/widgets/menu_drawer.dart';
 import 'package:abai_quiz/widgets/quiz_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,35 +9,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-class QuizData {
-  final String question;
-  final List<String> answers;
-  final int correct;
-
-  QuizData({
-    required this.question,
-    required this.answers,
-    required this.correct,
-  });
-
-  factory QuizData.fromJson(Map<String, dynamic> json) {
-    return QuizData(
-      question: json['question'] as String,
-      answers: List<String>.from(json['answers'] as List),
-      correct: json['correct'] as int,
-    );
-  }
-}
-
 class PageData {
   final String title;
   final String markdown;
 
   PageData({required this.title, required this.markdown});
 
-  // QuizData generateQuiz() {
-  //   return QuizData.fromJson(json);
-  // }
+  Future<List<QuestionData>?> generateQuiz() async {
+    final request = [
+      {
+        "role": "system",
+        "content":
+            "never respond with anything except text that is decodable from string to json.",
+      },
+      {
+        "role": "user",
+        "content":
+            "Please return quiz in json format about following title and text:\ntitle: ${title},\ntext: \n${markdown}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`.",
+      },
+    ];
+    final json_response;
+    try {
+      final response = await GroqAPI.get_response(request);
+      if (response.statusCode == 200) {
+        String cleanedString = GroqAPI.to_string(response).replaceAll(RegExp(r'```json|```'), '').trim();
+        json_response = jsonDecode(cleanedString);
+      } else {
+        print("Error: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Error sending message: $e");
+      return null;
+    }
+    List<QuestionData>? quiz = [];
+    for (Map<String, dynamic> question in json_response["questions"]) {
+      quiz.add(QuestionData.fromJson(question));
+    }
+    print(quiz);
+    return quiz;
+  }
 
   // factory PageData.fromJson(Map<String, dynamic> json) {
   //   return PageData(
@@ -63,27 +76,37 @@ class QuizesCache {
   }
 
   static Future<List<PageData>> loadPages() async {
-    final manifestJson = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifestMap = json.decode(manifestJson);
+    String jsonString = await rootBundle.loadString('assets/main/pages.json');
+    List<dynamic> jsonList = json.decode(jsonString)['pages'];
 
-    List<String> mdFiles = manifestMap.keys
-        .where((String key) =>
-            key.startsWith('assets/main/') && key.endsWith('.md'))
-        .toList();
+    final List<Future<PageData>> futures = jsonList.map((page) async {
+      final String title = page['title'];
+      final String filePath = page['file'];
 
-    List<PageData> pages = [];
-    for (String file in mdFiles) {
-      String content = await rootBundle.loadString(file);
-      String title =
-          file.split('/').last.replaceAll('_', ' ').replaceAll('.md', '');
-      pages.add(PageData(title: title, markdown: content));
-    }
+      final String markdown = await rootBundle.loadString(filePath);
+      return PageData(title: title, markdown: markdown);
+    }).toList();
 
-    return pages;
-    // String jsonString = await rootBundle.loadString('assets/main/pages.json');
-    // List<dynamic> jsonList = json.decode(jsonString)['pages'];
-    // _cachedPages = jsonList.map((json) => PageData.fromJson(json)).toList();
-    // return _cachedPages!;
+    _cachedPages = await Future.wait(futures);
+
+    return _cachedPages!;
+    // final manifestJson = await rootBundle.loadString('AssetManifest.json');
+    // final Map<String, dynamic> manifestMap = json.decode(manifestJson);
+
+    // List<String> mdFiles = manifestMap.keys
+    //     .where((String key) =>
+    //         key.startsWith('assets/main/') && key.endsWith('.md'))
+    //     .toList();
+
+    // List<PageData> pages = [];
+    // for (String file in mdFiles) {
+    //   String content = await rootBundle.loadString(file);
+    //   String title =
+    //       file.split('/').last.replaceAll('_', ' ').replaceAll('.md', '');
+    //   pages.add(PageData(title: title, markdown: content));
+    // }
+
+    // return pages;
   }
 }
 
@@ -131,17 +154,49 @@ class _QuizMainPageState extends State<QuizMainPage> {
   }
 }
 
-class PageWidget extends StatelessWidget {
+class PageWidget extends StatefulWidget {
   final PageData page;
 
   const PageWidget({super.key, required this.page});
+
+  @override
+  State<PageWidget> createState() => _PageWidgetState();
+}
+
+class _PageWidgetState extends State<PageWidget> {
+  int score = 0;
+  int totalQuestion = 1;
+
+  void loadNextQuestion(BuildContext context, QuestionPage nextQuestion) {
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (context) => nextQuestion,
+      ),
+    );
+  }
+
+  void startQuiz(BuildContext context) async {
+    List<QuestionData>? quiz = await widget.page.generateQuiz();
+    if (quiz == null) return;
+    totalQuestion = quiz.length;
+    QuestionPage questionPage =
+        QuestionPage(title: "Question 1", questionData: quiz[0], onRight: () {}, onWrong: () {});
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (context) => questionPage,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(page.title),
+        title: Text(widget.page.title),
       ),
       endDrawer: MenuDrawer(),
       body: ListView(
@@ -150,7 +205,7 @@ class PageWidget extends StatelessWidget {
           Container(
             child: MarkdownBody(
               selectable: true,
-              data: page.markdown,
+              data: widget.page.markdown,
               styleSheet: MarkdownStyleSheet(
                 h1: TextStyle(
                   fontSize: 26,
@@ -175,14 +230,7 @@ class PageWidget extends StatelessWidget {
             ),
           ),
           OutlinedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => PageWidget(page: page),
-                  ),
-                );
-              },
+              onPressed: () => startQuiz(context),
               style: OutlinedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),

@@ -6,10 +6,10 @@ class MessageWidget extends StatelessWidget {
   final bool isMyMessage;
 
   const MessageWidget({
-    Key? key,
+    super.key,
     required this.markdownText,
     this.isMyMessage = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
