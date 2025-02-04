@@ -1,0 +1,159 @@
+import 'package:abai_quiz/widgets/menu_drawer.dart';
+import 'package:flutter/material.dart';
+
+class QuestionData {
+  final String questionText;
+  final List<String> answers;
+  final int correct;
+
+  const QuestionData({
+    required this.questionText,
+    required this.answers,
+    required this.correct,
+  });
+
+  factory QuestionData.fromJson(Map<String, dynamic> json) {
+    return QuestionData(
+      questionText: json['question'] as String,
+      answers: List<String>.from(json['answers'] as List),
+      correct: json['correct'] as int,
+    );
+  }
+}
+
+class QuizScreen extends StatefulWidget {
+  final List<QuestionData> quiz;
+  const QuizScreen({super.key, required this.quiz});
+
+  @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  int currentQuestionIndex = 0;
+  late List<int?> userAnswers;
+  int score = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    userAnswers = List<int?>.filled(widget.quiz.length, null, growable: false);
+  }
+
+  void _updateSelectedOption(int? value) {
+    setState(() {
+      userAnswers[currentQuestionIndex] = value;
+    });
+  }
+
+  void _submitAnswer() {
+    if (userAnswers[currentQuestionIndex] == null) return;
+
+    if (currentQuestionIndex < widget.quiz.length - 1) {
+      setState(() {
+        currentQuestionIndex++;
+      });
+    } else {
+      _calculateScore();
+      _showResultDialog();
+    }
+  }
+
+  void _calculateScore() {
+    int newScore = 0;
+    for (int i = 0; i < widget.quiz.length; i++) {
+      if (userAnswers[i] == widget.quiz[i].correct) {
+        newScore++;
+      }
+    }
+    setState(() {
+      score = newScore;
+    });
+  }
+
+  void _goToPrevious() {
+    if (currentQuestionIndex > 0) {
+      setState(() {
+        currentQuestionIndex--;
+      });
+    }
+  }
+
+  void _showResultDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Quiz Completed'),
+        content: Text('Your score is $score out of ${widget.quiz.length}'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              setState(() {
+                currentQuestionIndex = 0;
+                score = 0;
+                userAnswers = List<int?>.filled(widget.quiz.length, null, growable: false);
+              });
+            },
+            child: const Text('Restart'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentQuestion = widget.quiz[currentQuestionIndex];
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text("Question ${currentQuestionIndex + 1} of ${widget.quiz.length}"),
+      ),
+      endDrawer: MenuDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              currentQuestion.questionText,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: currentQuestion.answers.length,
+                itemBuilder: (context, index) {
+                  return RadioListTile<int>(
+                    title: Text(currentQuestion.answers[index]),
+                    value: index,
+                    groupValue: userAnswers[currentQuestionIndex],
+                    onChanged: (int? value) {
+                      _updateSelectedOption(value);
+                    },
+                  );
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (currentQuestionIndex > 0)
+                  ElevatedButton(
+                    onPressed: _goToPrevious,
+                    child: const Text('Қайту'),
+                  ),
+                ElevatedButton(
+                  onPressed: userAnswers[currentQuestionIndex] == null ? null : _submitAnswer,
+                  child: const Text('Келесі'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

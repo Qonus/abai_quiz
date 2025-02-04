@@ -1,4 +1,3 @@
-import 'package:abai_quiz/pages/question.dart';
 import 'package:abai_quiz/pages/quizes.dart';
 import 'package:abai_quiz/pages/chat.dart';
 import 'package:abai_quiz/pages/home.dart';
@@ -65,7 +64,7 @@ class App extends StatefulWidget {
 }
 
 const List<Widget> widgetOptions = <Widget>[
-  QuestionPage(title: "title", questionData: QuestionData(question: "dddd", answers: ["df", "dfdfd"], correct: 0),),
+  HomePage(),
   ChatPage(),
   QuizMainPage(),
 ];

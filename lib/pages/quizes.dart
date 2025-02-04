@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:abai_quiz/groq_api_client.dart';
-import 'package:abai_quiz/pages/question.dart';
+import 'package:abai_quiz/pages/quiz.dart';
 import 'package:abai_quiz/widgets/menu_drawer.dart';
 import 'package:abai_quiz/widgets/quiz_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,13 +49,6 @@ class PageData {
     print(quiz);
     return quiz;
   }
-
-  // factory PageData.fromJson(Map<String, dynamic> json) {
-  //   return PageData(
-  //     title: json['title'],
-  //     markdown: json['markdown'],
-  //   );
-  // }
 }
 
 class QuizMainPage extends StatefulWidget {
@@ -167,26 +160,16 @@ class _PageWidgetState extends State<PageWidget> {
   int score = 0;
   int totalQuestion = 1;
 
-  void loadNextQuestion(BuildContext context, QuestionPage nextQuestion) {
-    Navigator.pop(context);
-    Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (context) => nextQuestion,
-      ),
-    );
-  }
-
   void startQuiz(BuildContext context) async {
     List<QuestionData>? quiz = await widget.page.generateQuiz();
     if (quiz == null) return;
     totalQuestion = quiz.length;
-    QuestionPage questionPage =
-        QuestionPage(title: "Question 1", questionData: quiz[0], onRight: () {}, onWrong: () {});
+    final quizScreen = QuizScreen(quiz: quiz);
+
     Navigator.push(
       context,
       CupertinoPageRoute(
-        builder: (context) => questionPage,
+        builder: (context) => quizScreen,
       ),
     );
   }
