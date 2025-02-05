@@ -32,7 +32,9 @@ class PageData {
     try {
       final response = await GroqAPI.get_response(request);
       if (response.statusCode == 200) {
-        String cleanedString = GroqAPI.to_string(response).replaceAll(RegExp(r'```json|```'), '').trim();
+        String cleanedString = GroqAPI.to_string(response)
+            .replaceAll(RegExp(r'```json|```'), '')
+            .trim();
         json_response = jsonDecode(cleanedString);
       } else {
         print("Error: ${response.statusCode}");
@@ -189,6 +191,15 @@ class _PageWidgetState extends State<PageWidget> {
             child: MarkdownBody(
               selectable: true,
               data: widget.page.markdown,
+              imageBuilder: (uri, title, alt) {
+                final assetPath = uri.toString().replaceFirst('resource:', '');
+                return Center(
+                  child: Image.asset(
+                    assetPath,
+                    fit: BoxFit.contain,
+                  ),
+                );
+              },
               styleSheet: MarkdownStyleSheet(
                 h1: TextStyle(
                   fontSize: 26,
@@ -212,12 +223,24 @@ class _PageWidgetState extends State<PageWidget> {
               ),
             ),
           ),
-          OutlinedButton(
-            onPressed: () => startQuiz(context),
-            style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          SizedBox(height: 80),
+          Align(
+            alignment: Alignment.center,
+            child: OutlinedButton(
+              onPressed: () => startQuiz(context),
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              ),
+              child: Text(
+                "Біліміңді тексер!",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
             ),
-            child: Text("Біліміңді тексер!")),
+          ),
+          SizedBox(height: 80),
         ],
       ),
     );
