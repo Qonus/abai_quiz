@@ -89,7 +89,7 @@ class _AppState extends State<App> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.house_outlined),
-            label: "Home",
+            label: "Басты бет",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_outlined),

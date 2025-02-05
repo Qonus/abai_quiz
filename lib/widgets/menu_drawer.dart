@@ -37,11 +37,11 @@ class _MenuDrawerState extends State<MenuDrawer> {
                 segments: [
                   ButtonSegment(
                       value: ThemeMode.light,
-                      label: Text('Light'),
+                      label: Text('Күн'),
                       icon: Icon(Icons.light_mode)),
                   ButtonSegment(
                       value: ThemeMode.dark,
-                      label: Text('Dark'),
+                      label: Text('Түн'),
                       icon: Icon(Icons.dark_mode)),
                 ],
                 selected: <ThemeMode>{Notifier.get().value},

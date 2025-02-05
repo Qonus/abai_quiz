@@ -3,14 +3,20 @@ import 'package:flutter/material.dart';
 
 class QuestionData {
   final String questionText;
-  final List<String> answers;
-  final int correct;
+  List<String> answers;
+  int correct;
 
-  const QuestionData({
+  QuestionData({
     required this.questionText,
     required this.answers,
     required this.correct,
   });
+
+  void randomizeAnswers() {
+    final correctAnswer = answers[correct];
+    answers.shuffle();
+    correct = answers.indexOf(correctAnswer);
+  }
 
   factory QuestionData.fromJson(Map<String, dynamic> json) {
     return QuestionData(
@@ -30,14 +36,25 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  List<QuestionData> new_quiz = List.empty();
   int currentQuestionIndex = 0;
   late List<int?> userAnswers;
   int score = 0;
+
+  List<QuestionData> randomizeQuiz(List<QuestionData> quiz) {
+    final randomizedQuiz = List<QuestionData>.from(quiz);
+    randomizedQuiz.shuffle();
+    for (var question in randomizedQuiz) {
+      question.randomizeAnswers();
+    }
+    return randomizedQuiz;
+  }
 
   @override
   void initState() {
     super.initState();
     userAnswers = List<int?>.filled(widget.quiz.length, null, growable: false);
+    new_quiz = randomizeQuiz(widget.quiz);
   }
 
   void _updateSelectedOption(int? value) {
@@ -49,7 +66,7 @@ class _QuizScreenState extends State<QuizScreen> {
   void _submitAnswer() {
     if (userAnswers[currentQuestionIndex] == null) return;
 
-    if (currentQuestionIndex < widget.quiz.length - 1) {
+    if (currentQuestionIndex < new_quiz.length - 1) {
       setState(() {
         currentQuestionIndex++;
       });
@@ -61,8 +78,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
   void _calculateScore() {
     int newScore = 0;
-    for (int i = 0; i < widget.quiz.length; i++) {
-      if (userAnswers[i] == widget.quiz[i].correct) {
+    for (int i = 0; i < new_quiz.length; i++) {
+      if (userAnswers[i] == new_quiz[i].correct) {
         newScore++;
       }
     }
@@ -85,7 +102,7 @@ class _QuizScreenState extends State<QuizScreen> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: const Text('Quiz Completed'),
-        content: Text('Your score is $score out of ${widget.quiz.length}'),
+        content: Text('Your score is $score out of ${new_quiz.length}'),
         actions: [
           TextButton(
             onPressed: () {
@@ -93,7 +110,8 @@ class _QuizScreenState extends State<QuizScreen> {
               setState(() {
                 currentQuestionIndex = 0;
                 score = 0;
-                userAnswers = List<int?>.filled(widget.quiz.length, null, growable: false);
+                userAnswers = List<int?>.filled(new_quiz.length, null,
+                    growable: false);
               });
             },
             child: const Text('Restart'),
@@ -105,12 +123,13 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentQuestion = widget.quiz[currentQuestionIndex];
+    final currentQuestion = new_quiz[currentQuestionIndex];
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text("Question ${currentQuestionIndex + 1} of ${widget.quiz.length}"),
+        title: Text(
+            "Question ${currentQuestionIndex + 1} of ${new_quiz.length}"),
       ),
       endDrawer: MenuDrawer(),
       body: Padding(
@@ -146,7 +165,9 @@ class _QuizScreenState extends State<QuizScreen> {
                     child: const Text('Қайту'),
                   ),
                 ElevatedButton(
-                  onPressed: userAnswers[currentQuestionIndex] == null ? null : _submitAnswer,
+                  onPressed: userAnswers[currentQuestionIndex] == null
+                      ? null
+                      : _submitAnswer,
                   child: const Text('Келесі'),
                 ),
               ],

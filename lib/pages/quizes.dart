@@ -20,12 +20,12 @@ class PageData {
       {
         "role": "system",
         "content":
-            "never respond with anything except text that is decodable from string to json.",
+            "Never respond with anything except text that is decodable from string to json. Don't talk to the user, do not say something like `Here is your answer`. Just include the json itself",
       },
       {
         "role": "user",
         "content":
-            "Please return quiz in json format about following title and text:\ntitle: ${title},\ntext: \n${markdown}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`. IMPORTANT! ALL TEXT SHOULD BE IN KAZAKH LANGUAGE.",
+            "Please return quiz in json format about following title and text:\ntitle: ${title},\ntext: \n${markdown}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`. IMPORTANT! ALL TEXT SHOULD BE IN KAZAKH LANGUAGE. Additionally, please make the incorrect answers very believable, the difficulty should be pretty high. I shouldn't be able to pass the quiz if I don't know the answer. So don't make the correct answer stand out among other ones.",
       },
     ];
     final json_response;
@@ -192,7 +192,7 @@ class _PageWidgetState extends State<PageWidget> {
               selectable: true,
               data: widget.page.markdown,
               imageBuilder: (uri, title, alt) {
-                final assetPath = uri.toString().replaceFirst('resource:', '');
+                final assetPath = uri.toString();
                 return Center(
                   child: Image.asset(
                     assetPath,

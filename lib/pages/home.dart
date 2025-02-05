@@ -9,7 +9,7 @@ class HomePage extends StatelessWidget {
     return Container(
             child: MarkdownBody(
               selectable: true,
-              data: "widget.page.markdown",
+              data: "# Абай Жолы",
               imageBuilder: (uri, title, alt) {
                 final assetPath = uri.toString();
                 return Center(
@@ -23,7 +23,7 @@ class HomePage extends StatelessWidget {
                 h1: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 h2: TextStyle(
                   fontSize: 23,
