@@ -25,7 +25,7 @@ class PageData {
       {
         "role": "user",
         "content":
-            "Please return quiz in json format about following title and text:\ntitle: ${title},\ntext: \n${markdown}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`.",
+            "Please return quiz in json format about following title and text:\ntitle: ${title},\ntext: \n${markdown}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`. IMPORTANT! ALL TEXT SHOULD BE IN KAZAKH LANGUAGE.",
       },
     ];
     final json_response;
@@ -213,11 +213,11 @@ class _PageWidgetState extends State<PageWidget> {
             ),
           ),
           OutlinedButton(
-              onPressed: () => startQuiz(context),
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              ),
-              child: Text("Біліміңді тексер!")),
+            onPressed: () => startQuiz(context),
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: Text("Біліміңді тексер!")),
         ],
       ),
     );
