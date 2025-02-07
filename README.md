@@ -4,7 +4,7 @@ This Flutter app delivers structured reading content with quizzes about "Аба�
 ## About
 School project made with [Flutter](https://docs.flutter.dev/).
 
-You can see all of the pages in app [here](https://github.com/Qonus/abai_quiz/tree/main/assets/main).
+You can see quiz pages [here](https://github.com/Qonus/abai_quiz/tree/main/assets/main), and home pages [here](https://github.com/Qonus/abai_quiz/tree/main/assets/analysis).
 
 ## Features 
 - Accurate information about Абай Жолы

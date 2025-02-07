@@ -31,6 +31,7 @@ class HomePage extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: pages.length,
                   itemBuilder: (context, index) {
+                    if (index == 0) return Center();
                     PageData page = pages[index];
                     return Container(
                       margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
