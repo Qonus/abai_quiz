@@ -1,3 +1,8 @@
+import 'package:abai_quiz/documents.dart';
+import 'package:abai_quiz/pages/quizes.dart';
+import 'package:abai_quiz/widgets/card.dart';
+import 'package:abai_quiz/widgets/page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -6,41 +11,48 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-            child: MarkdownBody(
-              selectable: true,
-              data: "# Абай Жолы",
-              imageBuilder: (uri, title, alt) {
-                final assetPath = uri.toString();
-                return Center(
-                  child: Image.asset(
-                    assetPath,
-                    fit: BoxFit.contain,
-                  ),
-                );
-              },
-              styleSheet: MarkdownStyleSheet(
-                h1: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                h2: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                h3: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                p: TextStyle(
-                  fontSize: 17,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
+    return FutureBuilder(
+      future: MyDocuments.getAnalysisPages(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Қате: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Мазмұн жоқ.'));
+        } else {
+          List<PageData> pages = snapshot.data!;
+          String homeMarkdown = pages[0].markdown;
+          return Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                MyMarkdownBody(data: homeMarkdown),
+                ListView.builder(
+                  itemCount: pages.length,
+                  itemBuilder: (context, index) {
+                    PageData page = pages[index];
+                    return Container(
+                      margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      child: MyCard(
+                        child: Text(page.title),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => MyMarkdownBody(data: page.markdown),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                )
+              ],
             ),
           );
+        }
+      },
+    );
   }
 }

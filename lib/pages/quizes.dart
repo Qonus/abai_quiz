@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:abai_quiz/documents.dart';
 import 'package:abai_quiz/groq_api_client.dart';
 import 'package:abai_quiz/pages/quiz.dart';
 import 'package:abai_quiz/widgets/menu_drawer.dart';
-import 'package:abai_quiz/widgets/quiz_card.dart';
+import 'package:abai_quiz/widgets/card.dart';
+import 'package:abai_quiz/widgets/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,51 +62,6 @@ class QuizMainPage extends StatefulWidget {
   State<QuizMainPage> createState() => _QuizMainPageState();
 }
 
-class QuizesCache {
-  static List<PageData>? _cachedPages;
-
-  static Future<List<PageData>> getPages() async {
-    if (_cachedPages != null) {
-      return _cachedPages!;
-    }
-    return await loadPages();
-  }
-
-  static Future<List<PageData>> loadPages() async {
-    String jsonString = await rootBundle.loadString('assets/main/pages.json');
-    List<dynamic> jsonList = json.decode(jsonString)['pages'];
-
-    final List<Future<PageData>> futures = jsonList.map((page) async {
-      final String title = page['title'];
-      final String filePath = page['file'];
-
-      final String markdown = await rootBundle.loadString(filePath);
-      return PageData(title: title, markdown: markdown);
-    }).toList();
-
-    _cachedPages = await Future.wait(futures);
-
-    return _cachedPages!;
-    // final manifestJson = await rootBundle.loadString('AssetManifest.json');
-    // final Map<String, dynamic> manifestMap = json.decode(manifestJson);
-
-    // List<String> mdFiles = manifestMap.keys
-    //     .where((String key) =>
-    //         key.startsWith('assets/main/') && key.endsWith('.md'))
-    //     .toList();
-
-    // List<PageData> pages = [];
-    // for (String file in mdFiles) {
-    //   String content = await rootBundle.loadString(file);
-    //   String title =
-    //       file.split('/').last.replaceAll('_', ' ').replaceAll('.md', '');
-    //   pages.add(PageData(title: title, markdown: content));
-    // }
-
-    // return pages;
-  }
-}
-
 class _QuizMainPageState extends State<QuizMainPage> {
   void _onTap(PageData page) {
     Navigator.push(
@@ -119,7 +76,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
   Widget build(BuildContext context) {
     return Center(
       child: FutureBuilder<List<PageData>>(
-        future: QuizesCache.loadPages(),
+        future: MyDocuments.getQuizPages(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -188,40 +145,7 @@ class _PageWidgetState extends State<PageWidget> {
         padding: EdgeInsets.all(10),
         children: [
           Container(
-            child: MarkdownBody(
-              selectable: true,
-              data: widget.page.markdown,
-              imageBuilder: (uri, title, alt) {
-                final assetPath = uri.toString();
-                return Center(
-                  child: Image.asset(
-                    assetPath,
-                    fit: BoxFit.contain,
-                  ),
-                );
-              },
-              styleSheet: MarkdownStyleSheet(
-                h1: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                h2: TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                h3: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                p: TextStyle(
-                  fontSize: 17,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ),
+            child: MyMarkdownBody(data: widget.page.markdown),
           ),
           SizedBox(height: 80),
           Align(
