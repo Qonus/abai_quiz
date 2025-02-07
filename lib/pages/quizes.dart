@@ -135,13 +135,9 @@ class _PageWidgetState extends State<PageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.page.title),
-      ),
-      endDrawer: MenuDrawer(),
-      body: ListView(
+    return PageScaffold(
+      title: Text(widget.page.title),
+      child: ListView(
         padding: EdgeInsets.all(10),
         children: [
           Container(

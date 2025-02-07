@@ -1,25 +1,28 @@
 {
-    "pages": [
-      {
-        "title": "1. Шығарма туралы жалпы ақпарат",
-        "file": "assets/main/1.md"
-      },
-      {
-        "title": "2. Автор жайлы ақпарат",
-        "file": "assets/main/2.md"
-      },
-      {
-        "title": "3. 1-бөлім: «Қайтқанда»",
-        "file": "assets/main/3.md"
-      },
-      {
-        "title": "4. 2-бөлім: «Қат-қабатта»",
-        "file": "assets/main/4.md"
-      },
-      {
-        "title": "5. 3-бөлім: «Жолда» ",
-        "file": "assets/main/5.md"
-      }
-    ]
-  }
-  
+  "pages": [
+    {
+      "title": "Home Page",
+      "file": "assets/analysis/Home.md"
+    },
+    {
+      "title": "1. Шығарма туралы жалпы ақпарат",
+      "file": "assets/analysis/1.md"
+    },
+    {
+      "title": "2. Автор жайлы ақпарат",
+      "file": "assets/analysis/2.md"
+    },
+    {
+      "title": "3. 1-бөлім: «Қайтқанда»",
+      "file": "assets/analysis/3.md"
+    },
+    {
+      "title": "4. 2-бөлім: «Қат-қабатта»",
+      "file": "assets/analysis/4.md"
+    },
+    {
+      "title": "5. 3-бөлім: «Жолда» ",
+      "file": "assets/analysis/5.md"
+    }
+  ]
+}

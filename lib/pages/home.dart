@@ -4,7 +4,6 @@ import 'package:abai_quiz/widgets/card.dart';
 import 'package:abai_quiz/widgets/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -29,6 +28,7 @@ class HomePage extends StatelessWidget {
               children: [
                 MyMarkdownBody(data: homeMarkdown),
                 ListView.builder(
+                  shrinkWrap: true,
                   itemCount: pages.length,
                   itemBuilder: (context, index) {
                     PageData page = pages[index];
@@ -40,7 +40,10 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => MyMarkdownBody(data: page.markdown),
+                              builder: (context) => PageScaffold(
+                                title: Text(page.title),
+                                child: MyMarkdownBody(data: page.markdown),
+                              ),
                             ),
                           );
                         },
