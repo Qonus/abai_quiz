@@ -101,20 +101,15 @@ class _QuizScreenState extends State<QuizScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('Quiz Completed'),
-        content: Text('Your score is $score out of ${new_quiz.length}'),
+        title: const Text('Тест аяқталды!'),
+        content: Text('Сіз ${new_quiz.length} сұрақтан $score сұраққа дұрыс жауап бердіңіз.'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              setState(() {
-                currentQuestionIndex = 0;
-                score = 0;
-                userAnswers =
-                    List<int?>.filled(new_quiz.length, null, growable: false);
-              });
+              Navigator.pop(context);
             },
-            child: const Text('Restart'),
+            child: const Text('Ок'),
           ),
         ],
       ),

@@ -7,49 +7,58 @@ import 'package:abai_quiz/widgets/card.dart';
 import 'package:abai_quiz/widgets/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PageData {
   final String title;
   final String markdown;
 
   PageData({required this.title, required this.markdown});
+}
 
-  Future<List<QuestionData>?> generateQuiz() async {
-    final request = [
-      {
-        "role": "system",
-        "content":
-            "Never respond with anything except text that is decodable from string to json. Don't talk to the user, do not say something like `Here is your answer`. Just include the json itself",
-      },
-      {
-        "role": "user",
-        "content":
-            "Please return quiz in json format about following title and text:\ntitle: ${title},\ntext: \n${markdown}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`. IMPORTANT! ALL TEXT SHOULD BE IN KAZAKH LANGUAGE. Additionally, please make the incorrect answers very believable, the difficulty should be pretty high. I shouldn't be able to pass the quiz if I don't know the answer. So don't make the correct answer stand out among other ones.",
-      },
-    ];
-    final json_response;
-    try {
-      final response = await GroqAPI.get_response(request);
-      if (response.statusCode == 200) {
-        String cleanedString = GroqAPI.to_string(response)
-            .replaceAll(RegExp(r'```json|```'), '')
-            .trim();
-        json_response = jsonDecode(cleanedString);
-      } else {
-        print("Error: ${response.statusCode}");
-        return null;
-      }
-    } catch (e) {
-      print("Error sending message: $e");
+class Quiz {
+  final PageData material;
+  int? totalQuestions;
+  int? score;
+
+  Quiz({required this.material, this.totalQuestions, this.score});
+}
+
+Future<List<QuestionData>?> generateQuiz(String context) async {
+  final request = [
+    {
+      "role": "system",
+      "content":
+          "Never respond with anything except text that is decodable from string to json. Don't talk to the user, do not say something like `Here is your answer`. Just include the json itself",
+    },
+    {
+      "role": "user",
+      "content":
+          "Please return quiz in json format about following text:\n${context}\n\nIt should contain list called `questions`, each question has question itself called `question`, list of strings called `answers` and integer index of correct answer which is called `correct`. IMPORTANT! ALL TEXT SHOULD BE IN KAZAKH LANGUAGE. Additionally, please make the incorrect answers very believable, the difficulty should be pretty high. I shouldn't be able to pass the quiz if I don't know the answer. So don't make the correct answer stand out among other ones.",
+    },
+  ];
+  final json_response;
+  try {
+    final response = await GroqAPI.get_response(request);
+    if (response.statusCode == 200) {
+      String cleanedString = GroqAPI.to_string(response)
+          .replaceAll(RegExp(r'```json|```'), '')
+          .trim();
+      json_response = jsonDecode(cleanedString);
+    } else {
+      print("Error: ${response.statusCode}");
       return null;
     }
-    List<QuestionData>? quiz = [];
-    for (Map<String, dynamic> question in json_response["questions"]) {
-      quiz.add(QuestionData.fromJson(question));
-    }
-    print(quiz);
-    return quiz;
+  } catch (e) {
+    print("Error sending message: $e");
+    return null;
   }
+  List<QuestionData>? quiz = [];
+  for (Map<String, dynamic> question in json_response["questions"]) {
+    quiz.add(QuestionData.fromJson(question));
+  }
+  print(quiz);
+  return quiz;
 }
 
 class QuizMainPage extends StatefulWidget {
@@ -60,6 +69,7 @@ class QuizMainPage extends StatefulWidget {
 }
 
 class _QuizMainPageState extends State<QuizMainPage> {
+
   void _onTap(PageData page) {
     Navigator.push(
       context,
@@ -94,6 +104,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
                     child: QuizCard(
                       title: page.title,
                       onTap: () => _onTap(page),
+                      progress: null,
                     ),
                   );
                 },
@@ -120,7 +131,8 @@ class _PageWidgetState extends State<PageWidget> {
   int totalQuestion = 1;
 
   void startQuiz(BuildContext context) async {
-    List<QuestionData>? quiz = await widget.page.generateQuiz();
+    List<QuestionData>? quiz =
+        await generateQuiz("${widget.page.title}\n\n\n${widget.page.markdown}");
     if (quiz == null) return;
     totalQuestion = quiz.length;
     final quizScreen = QuizScreen(quiz: quiz);
