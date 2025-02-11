@@ -34,16 +34,26 @@ class HomePage extends StatelessWidget {
                     if (index == 0) return Center();
                     PageData page = pages[index];
                     return Container(
-                      margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
                       child: MyCard(
-                        child: Text(page.title),
+                        child: Text(
+                          page.title,
+                          style: TextStyle(fontSize: 17),
+                        ),
                         onTap: () {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
                               builder: (context) => PageScaffold(
                                 title: Text(page.title),
-                                child: MyMarkdownBody(data: page.markdown),
+                                child: ListView(
+                                  children: [
+                                    MyMarkdownBody(data: page.markdown),
+                                  ],
+                                ),
                               ),
                             ),
                           );

@@ -3,13 +3,10 @@ import 'dart:convert';
 import 'package:abai_quiz/documents.dart';
 import 'package:abai_quiz/groq_api_client.dart';
 import 'package:abai_quiz/pages/quiz.dart';
-import 'package:abai_quiz/widgets/menu_drawer.dart';
 import 'package:abai_quiz/widgets/card.dart';
 import 'package:abai_quiz/widgets/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 
 class PageData {
   final String title;
@@ -86,18 +83,21 @@ class _QuizMainPageState extends State<QuizMainPage> {
             return Center(child: Text('Мазмұн жоқ.'));
           } else {
             List<PageData> pages = snapshot.data!;
-            return ListView.builder(
-              itemCount: pages.length,
-              itemBuilder: (context, index) {
-                PageData page = pages[index];
-                return Container(
-                  margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  child: QuizCard(
-                    title: page.title,
-                    onTap: () => _onTap(page),
-                  ),
-                );
-              },
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+              child: ListView.builder(
+                itemCount: pages.length,
+                itemBuilder: (context, index) {
+                  PageData page = pages[index];
+                  return Container(
+                    margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: QuizCard(
+                      title: page.title,
+                      onTap: () => _onTap(page),
+                    ),
+                  );
+                },
+              ),
             );
           }
         },
@@ -138,11 +138,8 @@ class _PageWidgetState extends State<PageWidget> {
     return PageScaffold(
       title: Text(widget.page.title),
       child: ListView(
-        padding: EdgeInsets.all(10),
         children: [
-          Container(
-            child: MyMarkdownBody(data: widget.page.markdown),
-          ),
+          MyMarkdownBody(data: widget.page.markdown),
           SizedBox(height: 80),
           Align(
             alignment: Alignment.center,

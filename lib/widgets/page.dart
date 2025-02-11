@@ -27,7 +27,7 @@ class MyMarkdownBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(15.0),
       child: MarkdownBody(
         selectable: true,
         data: data,
@@ -49,12 +49,12 @@ class MyMarkdownBody extends StatelessWidget {
           h2: TextStyle(
             fontSize: 23,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.inversePrimary,
+            color: Theme.of(context).colorScheme.primary,
           ),
           h3: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.inversePrimary,
+            color: Theme.of(context).colorScheme.primary,
           ),
           p: TextStyle(
             fontSize: 17,

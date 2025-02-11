@@ -110,8 +110,8 @@ class _QuizScreenState extends State<QuizScreen> {
               setState(() {
                 currentQuestionIndex = 0;
                 score = 0;
-                userAnswers = List<int?>.filled(new_quiz.length, null,
-                    growable: false);
+                userAnswers =
+                    List<int?>.filled(new_quiz.length, null, growable: false);
               });
             },
             child: const Text('Restart'),
@@ -128,8 +128,8 @@ class _QuizScreenState extends State<QuizScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(
-            "Question ${currentQuestionIndex + 1} of ${new_quiz.length}"),
+        title:
+            Text("Question ${currentQuestionIndex + 1} of ${new_quiz.length}"),
       ),
       endDrawer: MenuDrawer(),
       body: Padding(
@@ -159,12 +159,11 @@ class _QuizScreenState extends State<QuizScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (currentQuestionIndex > 0)
-                  ElevatedButton(
-                    onPressed: _goToPrevious,
-                    child: const Text('Қайту'),
-                  ),
-                ElevatedButton(
+                OutlinedButton(
+                  onPressed: currentQuestionIndex <= 0 ? null : _goToPrevious,
+                  child: const Text('Қайту'),
+                ),
+                OutlinedButton(
                   onPressed: userAnswers[currentQuestionIndex] == null
                       ? null
                       : _submitAnswer,
