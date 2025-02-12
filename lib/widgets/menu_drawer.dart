@@ -2,7 +2,6 @@ import 'package:abai_quiz/main.dart';
 import 'package:abai_quiz/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuDrawer extends StatefulWidget {
   const MenuDrawer({super.key});
@@ -41,8 +40,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
                     padding: WidgetStatePropertyAll(
                         EdgeInsets.symmetric(vertical: 15, horizontal: 20))),
                 onPressed: () async {
-                  var prefs = await SharedPreferences.getInstance();
-                  prefs.clear();
+                  Provider.of<QuizModel>(context, listen: false).clear();
                   Navigator.pop(context);
                 },
                 child: Text("Сіздің ақпаратты тазарту"),

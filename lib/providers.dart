@@ -38,4 +38,9 @@ class QuizModel extends ChangeNotifier {
     prefs!.setDouble('quiz_result_$index', value);
     notifyListeners();
   }
+
+  void clear() {
+    prefs!.clear();
+    notifyListeners();
+  }
 }
