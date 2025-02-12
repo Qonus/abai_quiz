@@ -69,21 +69,27 @@ class QuizMainPage extends StatefulWidget {
 }
 
 class _QuizMainPageState extends State<QuizMainPage> {
-
-  void _onTap(PageData page) {
+  void _onTap(PageData page, int index) {
     Navigator.push(
       context,
       CupertinoPageRoute(
-        builder: (context) => PageWidget(page: page),
+        builder: (context) => PageWidget(page: page, index: index),
       ),
     );
+  }
+
+  Future<Map<String, dynamic>> loadQuizes() async {
+    Map<String, dynamic> quizData = {};
+    quizData['pages'] = await MyDocuments.getQuizPages();
+    quizData['prefs'] = await SharedPreferences.getInstance();
+    return quizData;
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FutureBuilder<List<PageData>>(
-        future: MyDocuments.getQuizPages(),
+      child: FutureBuilder<Map<String, dynamic>>(
+        future: loadQuizes(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -92,7 +98,9 @@ class _QuizMainPageState extends State<QuizMainPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('Мазмұн жоқ.'));
           } else {
-            List<PageData> pages = snapshot.data!;
+            Map<String, dynamic> data = snapshot.data!;
+            List<PageData> pages = data['pages'];
+            SharedPreferences prefs = data['prefs'];
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: ListView.builder(
@@ -103,8 +111,8 @@ class _QuizMainPageState extends State<QuizMainPage> {
                     margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
                     child: QuizCard(
                       title: page.title,
-                      onTap: () => _onTap(page),
-                      progress: null,
+                      onTap: () => _onTap(page, index),
+                      progress: prefs.getDouble('quiz_result_$index'),
                     ),
                   );
                 },
@@ -119,8 +127,9 @@ class _QuizMainPageState extends State<QuizMainPage> {
 
 class PageWidget extends StatefulWidget {
   final PageData page;
+  final int index;
 
-  const PageWidget({super.key, required this.page});
+  const PageWidget({super.key, required this.page, required this.index});
 
   @override
   State<PageWidget> createState() => _PageWidgetState();
@@ -135,7 +144,13 @@ class _PageWidgetState extends State<PageWidget> {
         await generateQuiz("${widget.page.title}\n\n\n${widget.page.markdown}");
     if (quiz == null) return;
     totalQuestion = quiz.length;
-    final quizScreen = QuizScreen(quiz: quiz);
+    final quizScreen = QuizScreen(
+      quiz: quiz,
+      onFinish: (score, total) async {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setDouble('quiz_result_${widget.index}', score/total);
+      },
+    );
 
     Navigator.push(
       context,

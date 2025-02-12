@@ -27,9 +27,11 @@ class QuestionData {
   }
 }
 
+// onFinish (score, total_questions) {}
 class QuizScreen extends StatefulWidget {
   final List<QuestionData> quiz;
-  const QuizScreen({super.key, required this.quiz});
+  final Function(int, int)? onFinish;
+  const QuizScreen({super.key, required this.quiz, this.onFinish});
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -72,6 +74,7 @@ class _QuizScreenState extends State<QuizScreen> {
       });
     } else {
       _calculateScore();
+      widget.onFinish!(score, new_quiz.length);
       _showResultDialog();
     }
   }

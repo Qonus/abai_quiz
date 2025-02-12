@@ -1,6 +1,7 @@
 import 'package:abai_quiz/main.dart';
 import 'package:abai_quiz/pages/chat.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuDrawer extends StatefulWidget {
   const MenuDrawer({super.key});
@@ -32,6 +33,16 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   Messages.clear();
                 },
                 child: Text("Абай атамен жаңа чат"),
+              ),
+              OutlinedButton(
+                style: ButtonStyle(
+                    padding: WidgetStatePropertyAll(
+                        EdgeInsets.symmetric(vertical: 15, horizontal: 20))),
+                onPressed: () async {
+                  var prefs = await SharedPreferences.getInstance();
+                  prefs.clear();
+                },
+                child: Text("Сіздің ақпаратты тазарту"),
               ),
               SegmentedButton<ThemeMode>(
                 segments: [
