@@ -22,52 +22,20 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   bool _enabled = true;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   Messages.groq.startChat();
-  //   Messages.groq.setCustomInstructionsWith(
-  //       "You are AI simulating Абай Құнанбайұлы, You should ALWAYS respond in kazakh language that is decodable by utf8 and stay true to the character. Additional information: you are 50 years old, you did not die yet, and you shouldn't mention anything your character wouln't know about. Again, NEVER mention or include any information your character does not know, act like this character would, act like you know nothing about that thing you shouldn't know.");
-  // }
-
-  // Future<void> sendMessage() async {
-  //   String userMessage = _controller.text.trim();
-  //   if (userMessage.isEmpty) return;
-
-  //   setState(() {
-  //     Messages.add({"role": "user", "content": userMessage});
-  //   });
-
-  //   _controller.clear();
-
-  //   setState(() {
-  //     _enabled = false;
-  //     Messages.add({"role": "assistant", "content": ""});
-  //   });
-  //   try {
-  //     final GroqResponse response =
-  //         await Messages.groq.sendMessage(userMessage);
-  //     String aiMessage = extractFinalAnswer(
-  //         utf8.decode(latin1.encode(response.choices.first.message.content)));
-  //     print(response.choices.first.message.content);
-
-  //     setState(() {
-  //       _enabled = true;
-  //       Messages.messages.last = {"role": "assistant", "content": aiMessage};
-  //     });
-  //   } on GroqException catch (error) {
-  //     print("Error: ${error.message}");
-  //     setState(() {
-  //       _enabled = true;
-  //       Messages.messages.last = {
-  //         "role": "assistant",
-  //         "content": "Error: ${error.message}"
-  //       };
-  //     });
-  //   }
-  // }
+  void scrollDown() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+  }
 
   Future<void> sendMessage(ChatModel chatModel) async {
     String userMessage = _controller.text.trim();
@@ -79,6 +47,7 @@ class _ChatPageState extends State<ChatPage> {
       _enabled = false;
     });
     _controller.clear();
+    scrollDown();
 
     try {
       final response = await GroqAPI.get_response(chatModel.chatMessages);
@@ -87,8 +56,12 @@ class _ChatPageState extends State<ChatPage> {
 
         setState(() {
           _enabled = true;
-          chatModel.chatMessages.last = {"role": "assistant", "content": aiMessage};
+          chatModel.chatMessages.last = {
+            "role": "assistant",
+            "content": aiMessage
+          };
         });
+        scrollDown();
       } else {
         print("Error: ${response.statusCode}");
       }
@@ -104,6 +77,7 @@ class _ChatPageState extends State<ChatPage> {
       children: [
         Expanded(
           child: ListView.builder(
+            controller: _scrollController,
             itemCount: chatModel.chatMessages.length,
             itemBuilder: (context, index) {
               final message = chatModel.chatMessages[index];
