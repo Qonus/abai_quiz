@@ -140,6 +140,12 @@ class _PageWidgetState extends State<PageWidget> {
   int totalQuestion = 1;
 
   void startQuiz(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+
     List<QuestionData>? quiz =
         await generateQuiz("${widget.page.title}\n\n\n${widget.page.markdown}");
     if (quiz == null) return;
@@ -148,9 +154,11 @@ class _PageWidgetState extends State<PageWidget> {
       quiz: quiz,
       onFinish: (score, total) async {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setDouble('quiz_result_${widget.index}', score/total);
+        await prefs.setDouble('quiz_result_${widget.index}', score / total);
       },
     );
+    
+    Navigator.of(context).pop();
 
     Navigator.push(
       context,
