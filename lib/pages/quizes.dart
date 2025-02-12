@@ -140,8 +140,6 @@ class _PageWidgetState extends State<PageWidget> {
       barrierDismissible: false,
       builder: (context) => Center(child: CircularProgressIndicator()),
     );
-    
-    Navigator.of(context).pop();
 
     try {
       List<QuestionData>? quiz = await generateQuiz(
