@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:abai_quiz/documents.dart';
 import 'package:abai_quiz/groq_api_client.dart';
 import 'package:abai_quiz/pages/quiz.dart';
+import 'package:abai_quiz/providers.dart';
 import 'package:abai_quiz/widgets/card.dart';
 import 'package:abai_quiz/widgets/page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PageData {
@@ -73,18 +75,12 @@ class _QuizMainPageState extends State<QuizMainPage> {
     );
   }
 
-  Future<Map<String, dynamic>> loadQuizes() async {
-    Map<String, dynamic> quizData = {};
-    quizData['pages'] = await MyDocuments.getQuizPages();
-    quizData['prefs'] = await SharedPreferences.getInstance();
-    return quizData;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final quizModel = context.watch<QuizModel>();
     return Center(
-      child: FutureBuilder<Map<String, dynamic>>(
-        future: loadQuizes(),
+      child: FutureBuilder<List<PageData>>(
+        future: MyDocuments.getQuizPages(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -93,9 +89,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('Мазмұн жоқ.'));
           } else {
-            Map<String, dynamic> data = snapshot.data!;
-            List<PageData> pages = data['pages'];
-            SharedPreferences prefs = data['prefs'];
+            List<PageData> pages = snapshot.data!;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 10),
               child: ListView.builder(
@@ -107,7 +101,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
                     child: QuizCard(
                       title: page.title,
                       onTap: () => _onTap(page, index),
-                      progress: prefs.getDouble('quiz_result_$index'),
+                      progress: quizModel.getQuizResult(index),
                     ),
                   );
                 },
@@ -149,9 +143,8 @@ class _PageWidgetState extends State<PageWidget> {
 
       final quizScreen = QuizScreen(
         quiz: quiz,
-        onFinish: (score, total) async {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setDouble('quiz_result_${widget.index}', score / total);
+        onFinish: (score, total) {
+          Provider.of<QuizModel>(context, listen: false).saveQuizResult(widget.index, score / total);
         },
       );
       Navigator.of(context).pop();

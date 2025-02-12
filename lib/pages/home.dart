@@ -24,45 +24,40 @@ class HomePage extends StatelessWidget {
           String homeMarkdown = pages[0].markdown;
           return Padding(
             padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                MyMarkdownBody(data: homeMarkdown),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: pages.length,
-                  itemBuilder: (context, index) {
-                    if (index == 0) return Center();
-                    PageData page = pages[index];
-                    return Container(
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      child: MyCard(
-                        child: Text(
-                          page.title,
-                          style: TextStyle(fontSize: 17),
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => PageScaffold(
-                                title: Text(page.title),
-                                child: ListView(
-                                  children: [
-                                    MyMarkdownBody(data: page.markdown),
-                                  ],
-                                ),
-                              ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: pages.length,
+              itemBuilder: (context, index) {
+                if (index == 0) return MyMarkdownBody(data: homeMarkdown);
+                PageData page = pages[index];
+                return Container(
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: MyCard(
+                    child: Text(
+                      page.title,
+                      style: TextStyle(fontSize: 17),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => PageScaffold(
+                            title: Text(page.title),
+                            child: ListView(
+                              children: [
+                                MyMarkdownBody(data: page.markdown),
+                              ],
                             ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )
-              ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           );
         }

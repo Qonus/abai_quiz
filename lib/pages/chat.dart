@@ -1,36 +1,14 @@
 import 'package:abai_quiz/groq_api_client.dart';
+import 'package:abai_quiz/providers.dart';
 import 'package:abai_quiz/widgets/message.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
-}
-
-class Messages {
-  static Map<String, String> systemMessage = {
-    "role": "system",
-    "content":
-        "You are an AI simulating Абай Құнанбайұлы, You should ALWAYS respond in kazakh language and stay true to the character of kazakh poet. Act like Abai. Additional information: you are 50 years old, you did not die yet, and you shouldn't mention anything your character wouln't know about. Again, NEVER mention or include any information your character does not know, act like this character would, act like you know nothing about that thing you shouldn't know. You are talking with complete stranger, outside your home",
-  };
-  static List<Map<String, String>> messages = [
-    systemMessage,
-  ];
-  static void add(Map<String, String> message) {
-    messages.add(message);
-  }
-
-  static void clear() {
-    messages = [
-      systemMessage,
-    ];
-  }
-
-  static List<Map<String, String>> get() {
-    return messages;
-  }
 }
 
 // String extractFinalAnswer(String response) {
@@ -91,25 +69,25 @@ class _ChatPageState extends State<ChatPage> {
   //   }
   // }
 
-  Future<void> sendMessage() async {
+  Future<void> sendMessage(ChatModel chatModel) async {
     String userMessage = _controller.text.trim();
     if (userMessage.isEmpty) return;
 
     setState(() {
-      Messages.add({"role": "user", "content": userMessage});
-      Messages.add({"role": "assistant", "content": ""});
+      chatModel.add({"role": "user", "content": userMessage});
+      chatModel.add({"role": "assistant", "content": ""});
       _enabled = false;
     });
     _controller.clear();
 
     try {
-      final response = await GroqAPI.get_response(Messages.get());
+      final response = await GroqAPI.get_response(chatModel.chatMessages);
       if (response.statusCode == 200) {
         String aiMessage = GroqAPI.to_string(response);
 
         setState(() {
           _enabled = true;
-          Messages.messages.last = {"role": "assistant", "content": aiMessage};
+          chatModel.chatMessages.last = {"role": "assistant", "content": aiMessage};
         });
       } else {
         print("Error: ${response.statusCode}");
@@ -121,13 +99,14 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final chatModel = context.watch<ChatModel>();
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
-            itemCount: Messages.get().length,
+            itemCount: chatModel.chatMessages.length,
             itemBuilder: (context, index) {
-              final message = Messages.get()[index];
+              final message = chatModel.chatMessages[index];
               if (message["role"] == "system") return Container();
 
               return MessageWidget(
@@ -144,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
             maxLines: 5,
             minLines: 1,
             keyboardType: TextInputType.multiline,
-            onSubmitted: (_) => sendMessage(),
+            onSubmitted: (_) => sendMessage(chatModel),
             controller: _controller,
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.menu_book),
@@ -153,7 +132,7 @@ class _ChatPageState extends State<ChatPage> {
               suffixIcon: IconButton(
                 color: Theme.of(context).colorScheme.primary,
                 icon: Icon(Icons.arrow_upward),
-                onPressed: sendMessage,
+                onPressed: () => sendMessage(chatModel),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(35)),
