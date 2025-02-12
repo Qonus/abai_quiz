@@ -17,22 +17,23 @@ class GroqAPI {
       body: jsonEncode({
         "messages": messages,
         // DeepSeek
-        "model": "deepseek-r1-distill-llama-70b",
-        "temperature": 0.6,
-        "max_completion_tokens": 4096,
-        "top_p": 0.95,
-        "stream": false,
-        "reasoning_format": "hidden",
+        // "model": "deepseek-r1-distill-llama-70b",
+        // "temperature": 0.6,
+        // "max_completion_tokens": 4096,
+        // "top_p": 0.95,
+        // "stream": true,
+        // "reasoning_format": "hidden",
 
         // Llama (doesn't work for now)
-        // "model": "llama-3.3-70b-versatile",
-        // "temperature": 1,
-        // "max_completion_tokens": 1024,
-        // "top_p": 1,
-        // "stream": true,
-        // "stop": null
+        "model": "llama-3.3-70b-versatile",
+        "temperature": 1,
+        "max_completion_tokens": 1024,
+        "top_p": 1,
+        "stream": false,
+        "stop": null
       }),
     );
+    
     return response;
   }
 

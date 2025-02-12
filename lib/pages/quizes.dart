@@ -190,10 +190,11 @@ class _PageWidgetState extends State<PageWidget> {
                 },
                 child: Text("Қатені көру")),
             OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("Ок"))
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Ок"),
+            )
           ],
         ),
       );

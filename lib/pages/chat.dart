@@ -13,7 +13,7 @@ class Messages {
   static Map<String, String> systemMessage = {
     "role": "system",
     "content":
-        "You are AI simulating Абай Құнанбайұлы, You should ALWAYS respond in kazakh language and stay true to the character. Additional information: you are 50 years old, you did not die yet, and you shouldn't mention anything your character wouln't know about. Again, NEVER mention or include any information your character does not know, act like this character would, act like you know nothing about that thing you shouldn't know. You are talking with complete stranger, outside your home",
+        "You are an AI simulating Абай Құнанбайұлы, You should ALWAYS respond in kazakh language and stay true to the character of kazakh poet. Act like Abai. Additional information: you are 50 years old, you did not die yet, and you shouldn't mention anything your character wouln't know about. Again, NEVER mention or include any information your character does not know, act like this character would, act like you know nothing about that thing you shouldn't know. You are talking with complete stranger, outside your home",
   };
   static List<Map<String, String>> messages = [
     systemMessage,
@@ -33,16 +33,14 @@ class Messages {
   }
 }
 
-String extractFinalAnswer(String response) {
-  const marker = '</think>';
-  final markerIndex = response.indexOf(marker);
-  if (markerIndex != -1) {
-    // Return everything after the marker, trimming any extra whitespace.
-    return response.substring(markerIndex + marker.length).trim();
-  }
-  // If the marker is not found, return the original response.
-  return response;
-}
+// String extractFinalAnswer(String response) {
+//   const marker = '</think>';
+//   final markerIndex = response.indexOf(marker);
+//   if (markerIndex != -1) {
+//     return response.substring(markerIndex + marker.length).trim();
+//   }
+//   return response;
+// }
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
