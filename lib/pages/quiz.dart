@@ -107,7 +107,7 @@ class _QuizScreenState extends State<QuizScreen> {
         title: const Text('Тест аяқталды!'),
         content: Text('Сіз ${new_quiz.length} сұрақтан $score сұраққа дұрыс жауап бердіңіз.'),
         actions: [
-          TextButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.of(ctx).pop();
               Navigator.pop(context);

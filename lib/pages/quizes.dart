@@ -38,19 +38,14 @@ Future<List<QuestionData>?> generateQuiz(String context) async {
     },
   ];
   final json_response;
-  try {
-    final response = await GroqAPI.get_response(request);
-    if (response.statusCode == 200) {
-      String cleanedString = GroqAPI.to_string(response)
-          .replaceAll(RegExp(r'```json|```'), '')
-          .trim();
-      json_response = jsonDecode(cleanedString);
-    } else {
-      print("Error: ${response.statusCode}");
-      return null;
-    }
-  } catch (e) {
-    print("Error sending message: $e");
+  final response = await GroqAPI.get_response(request);
+  if (response.statusCode == 200) {
+    String cleanedString = GroqAPI.to_string(response)
+        .replaceAll(RegExp(r'```json|```'), '')
+        .trim();
+    json_response = jsonDecode(cleanedString);
+  } else {
+    print("Error: ${response.statusCode}");
     return null;
   }
   List<QuestionData>? quiz = [];
@@ -140,24 +135,69 @@ class _PageWidgetState extends State<PageWidget> {
   int totalQuestion = 1;
 
   void startQuiz(BuildContext context) async {
-    List<QuestionData>? quiz =
-        await generateQuiz("${widget.page.title}\n\n\n${widget.page.markdown}");
-    if (quiz == null) return;
-    totalQuestion = quiz.length;
-    final quizScreen = QuizScreen(
-      quiz: quiz,
-      onFinish: (score, total) async {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setDouble('quiz_result_${widget.index}', score/total);
-      },
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
     );
 
-    Navigator.push(
-      context,
-      CupertinoPageRoute(
-        builder: (context) => quizScreen,
-      ),
-    );
+    try {
+      List<QuestionData>? quiz = await generateQuiz(
+          "${widget.page.title}\n\n\n${widget.page.markdown}");
+      if (quiz == null) throw Error();
+      totalQuestion = quiz.length;
+
+      final quizScreen = QuizScreen(
+        quiz: quiz,
+        onFinish: (score, total) async {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setDouble('quiz_result_${widget.index}', score / total);
+        },
+      );
+      Navigator.of(context).pop();
+
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => quizScreen,
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Қате!"),
+          content: Text("Тест жасау кезінде қате шықты, қайтадан көріңіз."),
+          actions: [
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: Text(e.toString()),
+                      actions: [
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Ок"),
+                        )
+                      ],
+                    ),
+                  );
+                },
+                child: Text("Қатені көру")),
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Ок"))
+          ],
+        ),
+      );
+    }
   }
 
   @override
