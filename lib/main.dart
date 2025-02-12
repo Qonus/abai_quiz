@@ -4,11 +4,9 @@ import 'package:abai_quiz/pages/home.dart';
 import 'package:abai_quiz/providers.dart';
 import 'package:abai_quiz/widgets/menu_drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  await dotenv.load();
   await QuizModel.loadPrefs();
   runApp(MultiProvider(
     providers: [

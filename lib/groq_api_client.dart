@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 
 class GroqAPI {
@@ -12,7 +10,7 @@ class GroqAPI {
       Uri.parse(api_url),
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer ${dotenv.env['GROQ_API_KEY']}",
+        "Authorization": "Bearer ${String.fromEnvironment('GROQ_API_KEY')}",
       },
       body: jsonEncode({
         "messages": messages,
