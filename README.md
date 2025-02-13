@@ -12,6 +12,7 @@ You can see quiz pages [here](https://github.com/Qonus/abai_quiz/tree/main/asset
 - Chat with Abai himself, the main character of the novel
 - AI generated quizes to test your knowledge on topic
 
-## Setup
-
-Get groq api key and set "GROQ_API_KEY" in .env
+## Running
+```
+flutter run --dart-define=GROQ_API_KEY=YOUR_GROQ_API_KEY
+```
