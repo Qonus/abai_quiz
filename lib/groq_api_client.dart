@@ -6,7 +6,7 @@ class GroqAPI {
       "https://api.groq.com/openai/v1/chat/completions";
 
   static Future<Response> get_response(List<Map<String, String>> messages) async {
-    const api_key = String.fromEnvironment('GROQ_API_KEY');
+    const String api_key = String.fromEnvironment('GROQ_API_KEY');
     final response = await post(
       Uri.parse(api_url),
       headers: {

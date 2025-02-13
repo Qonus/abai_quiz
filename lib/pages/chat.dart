@@ -27,14 +27,14 @@ class _ChatPageState extends State<ChatPage> {
 
   void scrollDown() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-            );
-          }
-        });
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   Future<void> sendMessage(ChatModel chatModel) async {
@@ -67,6 +67,44 @@ class _ChatPageState extends State<ChatPage> {
       }
     } catch (e) {
       print("Error sending message: $e");
+      setState(() {
+        _enabled = true;
+        chatModel.chatMessages.last = {"role": "assistant", "content": "Қате!"};
+      });
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Қате!"),
+          content: Text("Сұрақ жіберу кезінде қате шықты, қайтадан көріңіз."),
+          actions: [
+            OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      content: Text(e.toString()),
+                      actions: [
+                        OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text("Ок"),
+                        )
+                      ],
+                    ),
+                  );
+                },
+                child: Text("Қатені көру")),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Ок"),
+            )
+          ],
+        ),
+      );
     }
   }
 
