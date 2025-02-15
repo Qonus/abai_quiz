@@ -1,6 +1,8 @@
 # Абай Quiz
 This Flutter app delivers structured reading content with quizzes about "Абай Жолы".
 
+![image](https://github.com/user-attachments/assets/3d5794c4-4d62-46b7-b805-f86f7fa8585f)
+
 ## About
 School project made with [Flutter](https://docs.flutter.dev/).
 
